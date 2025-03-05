@@ -1,10 +1,15 @@
 package com.devs.filmzy.src.views
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Scaffold
@@ -13,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.twotone.Menu
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +77,7 @@ fun HomeView() {
     }
 
     LaunchedEffect(listState) {
-        snapshotFlow { listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 70 } // seperti deps di useEffect
+        snapshotFlow { listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 70 } // seperti dependency di useEffect
             .distinctUntilChanged() // Mencegah update kalau value tidak berubah
             .collect { offset ->
                 val tempUseBottomBorder = listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 70
@@ -116,19 +126,11 @@ fun HomeView() {
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             )
             {
-                item { NowShowingList(nowPlayingMovieState.copy(results = nowPlayingMovieState.results.take(Constants.nowShowingHome))) }
+                item { NowShowingList(nowPlayingMovieState.copy(results = nowPlayingMovieState.results.take(Constants.nowShowingListHome))) }
                 item {
                     HeaderComponent(
                         titleLeft = "Discovery",
-                        contentPadding = PaddingValues(top = 10.dp, bottom = 5.dp, start = 10.dp, end = 10.dp),
-                        contentRight = {
-                            ButtonComponent(
-                                text = "See more",
-                                onClick = {
-
-                                }
-                            )
-                        }
+                        contentPadding = PaddingValues(top = 10.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
                     )
                 }
                 itemsIndexed(
@@ -151,12 +153,14 @@ fun NowShowingList (
             titleLeft = "Now Showing",
             contentPadding = PaddingValues(vertical = 20.dp, horizontal = 10.dp),
             contentRight = {
-                ButtonComponent(
-                    text = "See more",
-                    onClick = {
+                if (state.results.isNotEmpty()) {
+                    ButtonComponent(
+                        text = "See more",
+                        onClick = {
 
-                    }
-                )
+                        }
+                    )
+                }
             }
         )
         LazyRow (
@@ -168,6 +172,46 @@ fun NowShowingList (
                 key = { index, movie -> movie?.id ?: index }
             ) { index, movie ->
                 MovieCardVerticalComponent(movie = movie, isShimmer = state.loading)
+            }
+            // Footer Last Index
+            item {
+                if (state.results.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .height(Constants.ConfigMovieCardVerticalComponentImage.height)
+                            .width( Constants.ConfigMovieCardVerticalComponentImage.width - 40.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Column(
+                            modifier = Modifier.clickable { },
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(top = 4.dp)
+                                    .size(35.dp)
+                                    .shadow(3.dp, shape = CircleShape)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
+                            ) {
+                                IconComponent(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    tint = MaterialTheme.colorScheme.background,
+                                    modifier = Modifier
+                                        .size(24.dp) // Ukuran ikon
+                                        .align(Alignment.Center)
+                                )
+                            }
+                            Text(
+                                "See more",
+                                style = fontStyle.textMulishBold(),
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }

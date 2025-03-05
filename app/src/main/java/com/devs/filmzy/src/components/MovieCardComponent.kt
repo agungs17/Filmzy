@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.devs.filmzy.src.models.MovieList.Movie
 import com.devs.filmzy.src.services.ConfigApi
 import com.devs.filmzy.src.theme.fontStyle
+import com.devs.filmzy.src.utils.Constants
 import com.devs.filmzy.src.utils.NavigationManager
 import com.devs.filmzy.src.utils.roundFloat
 import com.devs.filmzy.src.viewModels.misc.NavigateViewModel
@@ -44,15 +45,11 @@ fun toDetailMovie (
 
 @Composable
 fun MovieCardHorizontalComponent(
+    modifier: Modifier = Modifier,
     navigation: NavigationManager = hiltViewModel<NavigateViewModel>().navigation,
     movie: Movie? = null,
-    modifier: Modifier = Modifier,
     isShimmer: Boolean = false
 ) {
-    val round = 8.dp
-    val width = 100.dp
-    val height = 135.dp
-
     Row (
         modifier = modifier
             .fillMaxWidth()
@@ -65,10 +62,10 @@ fun MovieCardHorizontalComponent(
         verticalAlignment = Alignment.CenterVertically
     ) {
         ImageUrl(
-            url = "${ConfigApi.BASE_URL_IMG + movie?.poster_path}",
-            width,
-            height,
-            round,
+            url = ConfigApi.BASE_URL_IMG + movie?.poster_path,
+            Constants.ConfigMovieCardHorizontalComponentImage.width,
+            Constants.ConfigMovieCardHorizontalComponentImage.height,
+            Constants.ConfigMovieCardHorizontalComponentImage.round,
             isShimmer
         )
         Column (
@@ -78,7 +75,7 @@ fun MovieCardHorizontalComponent(
                 isShimmer = isShimmer
             ) {
                 Text(
-                    "${movie?.title ?: ""}",
+                    movie?.title ?: "",
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth(),
@@ -97,14 +94,12 @@ fun MovieCardHorizontalComponent(
                             .padding(vertical = 4.dp),
                         crossAxisSpacing = 4.dp
                     ) {
-                        movie?.genre.let { genres ->
-                            if (genres != null) {
-                                for (genreData in genres) {
-                                    BadgeComponent(
-                                        text = genreData.name,
-                                        modifier = Modifier.padding(end = 5.dp)
-                                    )
-                                }
+                        movie.genre.let { genres ->
+                            for (genreData in genres) {
+                                BadgeComponent(
+                                    text = genreData.name,
+                                    modifier = Modifier.padding(end = 5.dp)
+                                )
                             }
                         }
                     }
@@ -114,7 +109,7 @@ fun MovieCardHorizontalComponent(
                 isShimmer = isShimmer
             ) {
                 Text(
-                    "${movie?.overview ?: ""}",
+                    movie?.overview ?: "",
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth(),
@@ -131,18 +126,14 @@ fun MovieCardHorizontalComponent(
 
 @Composable
 fun MovieCardVerticalComponent(
+    modifier: Modifier = Modifier,
     navigation: NavigationManager = hiltViewModel<NavigateViewModel>().navigation,
     movie: Movie? = null,
-    modifier: Modifier = Modifier,
     isShimmer: Boolean = false
 ) {
-    val round = 8.dp
-    val width = 130.dp
-    val height = 190.dp
-
     Column (
         modifier = modifier
-            .width(width)
+            .width(Constants.ConfigMovieCardVerticalComponentImage.width)
             .run {
                 if(isShimmer) this
                 else clickable{
@@ -151,10 +142,10 @@ fun MovieCardVerticalComponent(
             },
     ) {
         ImageUrl(
-            url = "${ConfigApi.BASE_URL_IMG + movie?.poster_path}",
-            width,
-            height,
-            round,
+            url = ConfigApi.BASE_URL_IMG + movie?.poster_path,
+            Constants.ConfigMovieCardVerticalComponentImage.width,
+            Constants.ConfigMovieCardVerticalComponentImage.height,
+            Constants.ConfigMovieCardVerticalComponentImage.round,
             isShimmer
         )
         ShimmerComponent(
@@ -162,11 +153,11 @@ fun MovieCardVerticalComponent(
             paddingShimmer = PaddingValues(top = 4.dp)
         ) {
             Text(
-                "${movie?.title ?: ""}",
+                movie?.title ?: "",
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
-                    .width(width)
+                    .width(Constants.ConfigMovieCardVerticalComponentImage.width)
                     .padding(top = 4.dp),
                 style = fontStyle.textMulishBold(TextStyle(fontSize = 15.sp))
             )
@@ -200,7 +191,7 @@ fun RatingMovie (
                     imageVector = Icons.Filled.Star,
                     tint = Color(0xFFFFD700),
                     sizeIcon = 15.dp,
-                    modifierContainer = Modifier.padding(end = 3.dp)
+                    modifier = Modifier.padding(end = 3.dp)
                 )
                 Text(
                     "${roundFloat(safeRating)}/10",

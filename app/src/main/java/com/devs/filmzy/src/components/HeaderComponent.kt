@@ -1,5 +1,6 @@
 package com.devs.filmzy.src.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,8 +27,9 @@ import com.devs.filmzy.src.viewModels.misc.NavigateViewModel
 
 @Composable
 fun HeaderComponent(
+    modifier: Modifier = Modifier,
     navigation: NavigationManager = hiltViewModel<NavigateViewModel>().navigation,
-    containerModifier: Modifier = Modifier,
+    bgColor: Color = MaterialTheme.colorScheme.background,
 
     modifierContent: Modifier = Modifier,
     contentPadding : PaddingValues = PaddingValues(vertical = 15.dp, horizontal = 15.dp),
@@ -45,7 +48,8 @@ fun HeaderComponent(
     contentRight : @Composable (() -> Unit)? = null,
 ) {
     Box(
-        modifier = containerModifier
+        modifier = modifier
+            .background(bgColor)
             .fillMaxWidth()
     ) {
         Column(
@@ -77,7 +81,7 @@ fun HeaderComponent(
                         if(titleLeft != "") Text(text = titleLeft, style = fontStyle.textMerriwatherBold(
                             TextStyle(fontSize = 16.sp)
                         ), modifier = Modifier.padding(start = 10.dp))
-                    } else contentLeft?.invoke()
+                    } else contentLeft.invoke()
                 }
 
                 Box(
@@ -91,7 +95,7 @@ fun HeaderComponent(
                         .align(Alignment.CenterEnd),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if(contentRight != null) contentRight?.invoke()
+                    if(contentRight != null) contentRight.invoke()
                 }
             }
 

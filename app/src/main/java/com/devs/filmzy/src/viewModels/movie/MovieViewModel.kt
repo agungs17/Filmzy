@@ -2,6 +2,9 @@ package com.devs.filmzy.src.viewModels.movie
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.devs.filmzy.src.repositories.GenreListRepository
+import com.devs.filmzy.src.repositories.MovieDetailRepository
+import com.devs.filmzy.src.repositories.MovieListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -9,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GenreViewModel @Inject constructor(
-    private val repository: MovieRepository
+    private val repository: GenreListRepository
 ) : ViewModel() {
 
     val state = repository.genreState
@@ -24,7 +27,7 @@ class GenreViewModel @Inject constructor(
 
 @HiltViewModel
 class NowPlayingViewModel @Inject constructor(
-    private val repository: MovieRepository
+    private val repository: MovieListRepository
 ) : ViewModel() {
 
     val state = repository.nowPlayingState
@@ -39,7 +42,7 @@ class NowPlayingViewModel @Inject constructor(
 
 @HiltViewModel
 class DiscoveryMovieViewModel @Inject constructor(
-    private val repository: MovieRepository
+    private val repository: MovieListRepository
 ) : ViewModel() {
 
     val state = repository.discoveryState
@@ -54,20 +57,20 @@ class DiscoveryMovieViewModel @Inject constructor(
 
 @HiltViewModel
 class MovieDetailViewModel @Inject constructor(
-    private val repository: MovieRepository
+    private val movieDetailRepository: MovieDetailRepository
 ) : ViewModel() {
 
-    val state = repository.movieDetailState
+    val state = movieDetailRepository.movieDetailState
 
     fun fetch(movieId : Int) {
         viewModelScope.launch {
-            repository.fetchMovieDetail(movieId)
+            movieDetailRepository.fetchMovieDetail(movieId)
         }
     }
 
     fun reset() {
         viewModelScope.launch {
-            repository.resetMovieDetail()
+            movieDetailRepository.resetMovieDetail()
         }
     }
 }

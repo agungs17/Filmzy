@@ -17,21 +17,21 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun IconComponent(
     imageVector: ImageVector,
+    modifier: Modifier = Modifier,
     contentDescription: String = "DefaultIcon",
     tint : Color = MaterialTheme.colorScheme.onPrimary,
     sizeIcon: Dp = 28.dp,
-    modifierContainer: Modifier = Modifier,
-    modifierContent: Modifier = Modifier,
+    modifierIcon: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
     Box(
-        modifier = modifierContainer
+        modifier = modifier
             .clip(CircleShape)
             .run {
                 if(onClick == null) this
                 else {
                     clickable {
-                        onClick?.invoke()
+                        onClick.invoke()
                     }
                 }
             }
@@ -41,7 +41,7 @@ fun IconComponent(
             imageVector = imageVector,
             contentDescription = contentDescription,
             tint = tint,
-            modifier = modifierContent.size(sizeIcon)
+            modifier = modifierIcon.size(sizeIcon)
         )
     }
 }

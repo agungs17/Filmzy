@@ -1,5 +1,6 @@
 package com.devs.filmzy.src.views
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,12 +38,12 @@ import com.devs.filmzy.src.components.IconComponent
 import com.devs.filmzy.src.components.ImageComponent
 import com.devs.filmzy.src.services.ConfigApi
 import com.devs.filmzy.src.theme.fontStyle
+import com.devs.filmzy.src.utils.Constants.heightImageBackdropDetailMovie
 import com.devs.filmzy.src.utils.roundFloat
 import com.devs.filmzy.src.viewModels.movie.MovieDetailViewModel
 import com.google.accompanist.flowlayout.FlowRow
 
-val sizeImage = 220.dp
-
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DetailMovieView(movieId: Int?) {
     val movieDetailViewModel: MovieDetailViewModel = hiltViewModel()
@@ -64,15 +65,16 @@ fun DetailMovieView(movieId: Int?) {
     Scaffold(
         topBar = {
             HeaderComponent(
+                bgColor = Color.Transparent,
                 contentPadding = PaddingValues(top = 30.dp, bottom = 10.dp, start = 15.dp, end = 15.dp),
                 useBack = true,
             )
         },
     ) { _ ->
         ImageComponent(
-            model = "${ConfigApi.BASE_URL_IMG + detailResult?.backdrop_path}",
+            model = ConfigApi.BASE_URL_IMG + detailResult?.backdrop_path,
             modifier = Modifier.fillMaxWidth(),
-            height = sizeImage
+            height = heightImageBackdropDetailMovie
         )
         Box(
             modifier = Modifier
@@ -86,10 +88,10 @@ fun DetailMovieView(movieId: Int?) {
                     .padding(horizontal = 15.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(top = sizeImage - 50.dp, start = 10.dp, end = 10.dp),
+                    modifier = Modifier.padding(top = heightImageBackdropDetailMovie - 50.dp, start = 10.dp, end = 10.dp),
                 ) {
                     ImageComponent(
-                        model = "${ConfigApi.BASE_URL_IMG + detailResult?.poster_path}",
+                        model = ConfigApi.BASE_URL_IMG + detailResult?.poster_path,
                         modifier = Modifier.shadow(3.dp, RoundedCornerShape(8.dp)),
                         width = 140.dp,
                         height = 200.dp,
@@ -99,14 +101,14 @@ fun DetailMovieView(movieId: Int?) {
                         modifier = Modifier.padding(top = 58.dp, start = 10.dp)
                     ) {
                         Text(
-                            "${detailResult?.title ?: ""}",
+                            detailResult?.title ?: "",
                             style = fontStyle.textMulishBold(TextStyle(fontSize = 18.sp)),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
                         if (detailResult?.adult != null) {
                             Text(
-                                "${if (detailResult.adult == true) "(Adult)" else "(General Audience)"}",
+                                if (detailResult.adult == true) "(Adult)" else "(General Audience)",
                                 modifier = Modifier.padding(top = 4.dp),
                                 style = fontStyle.textMulishSemiBold(
                                     TextStyle(
@@ -138,7 +140,7 @@ fun DetailMovieView(movieId: Int?) {
                                     imageVector = Icons.Filled.Star,
                                     tint = Color(0xFFFFD700),
                                     sizeIcon = 15.dp,
-                                    modifierContainer = Modifier.padding(end = 3.dp)
+                                    modifier = Modifier.padding(end = 3.dp)
                                 )
                                 Text(
                                     "${roundFloat(safeRating)}/10",
@@ -154,7 +156,7 @@ fun DetailMovieView(movieId: Int?) {
 
                     if (detailResult?.tagline?.isNotEmpty() == true) {
                         Text(
-                            "“${detailResult?.tagline}”",
+                            "“${detailResult.tagline}”",
                             style = fontStyle.textMerriwatherBold(TextStyle(fontSize = 15.sp))
                         )
                     }
@@ -175,11 +177,12 @@ fun DetailMovieView(movieId: Int?) {
                         modifier = Modifier.padding(top = 6.dp)
                     )
 
-                    Text(
-                        "Cast",
-                        style = fontStyle.textMerriwatherBold(TextStyle(fontSize = 15.sp)),
-                        modifier = Modifier.padding(top = 12.dp)
-                    )
+//                    Text(
+//                        "Cast",
+//                        style = fontStyle.textMerriwatherBold(TextStyle(fontSize = 15.sp)),
+//                        modifier = Modifier.padding(top = 12.dp)
+//                    )
+
                 }
             }
         }

@@ -1,26 +1,25 @@
-package com.devs.filmzy.src.viewModels.movie
+package com.devs.filmzy.src.repositories
 
 import com.devs.filmzy.src.models.GenreList.StateGenreList
 import com.devs.filmzy.src.models.MovieDetail.StateMovieDetail
 import com.devs.filmzy.src.models.MovieList.StateMovieList
 import com.devs.filmzy.src.services.ApiInterface
 import com.devs.filmzy.src.utils.combineMovieGenre
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
+
+// >>> Genre Repository
 @Singleton
-class MovieRepository @Inject constructor(
+class GenreListRepository @Inject constructor(
     private val api: ApiInterface
 ) {
-
     private val _genreState = MutableStateFlow(StateGenreList())
     val genreState = _genreState.asStateFlow()
-    private var isFetchedGenre = false  // flag genre hanya di fetch sekali saja
+    private var isFetchedGenre = false
     suspend fun fetchGenres() {
-        // fetch di lakukan di MainActivity
         if (isFetchedGenre) return
         isFetchedGenre = true
         _genreState.value = StateGenreList(loading = true)
@@ -41,15 +40,22 @@ class MovieRepository @Inject constructor(
             isFetchedGenre = false
         }
     }
+}
+
+
+
+// >>> Movie Repository
+@Singleton
+class MovieListRepository @Inject constructor(
+    private val api: ApiInterface,
+    private val genreRepository: GenreListRepository
+) {
 
     private val _nowPlayingState = MutableStateFlow(StateMovieList())
     val nowPlayingState = _nowPlayingState.asStateFlow()
     suspend fun fetchNowPlayingMovies(page: Int = 1) {
         _nowPlayingState.value = _nowPlayingState.value.copy(loading = true)
-
-        // menunggu genreState.result selesai terlebih dahulu
-        val genres = genreState.first { it.genres.isNotEmpty() }.genres
-
+        val genres = genreRepository.genreState.first { it.genres.isNotEmpty() }.genres // async/menunggu gendres ada isinya
         try {
             val response = api.getNowPlayingMovieService(page)
             if (response.isSuccessful && response.body() != null) {
@@ -68,15 +74,11 @@ class MovieRepository @Inject constructor(
         }
     }
 
-
     private val _discoveryState = MutableStateFlow(StateMovieList())
     val discoveryState = _discoveryState.asStateFlow()
     suspend fun fetchDiscoveryMovies(page: Int = 1) {
         _discoveryState.value = _discoveryState.value.copy(loading = true)
-
-        // menunggu genreState.result selesai terlebih dahulu
-        val genres = genreState.first { it.genres.isNotEmpty() }.genres
-
+        val genres = genreRepository.genreState.first { it.genres.isNotEmpty() }.genres // async/menunggu gendres ada isinya
         try {
             val response = api.getDiscoveryMovieService(page)
             if (response.isSuccessful && response.body() != null) {
@@ -94,10 +96,18 @@ class MovieRepository @Inject constructor(
             _discoveryState.value = StateMovieList(error = true)
         }
     }
+}
 
+
+
+// >>> Movie Detail Repository
+@Singleton
+class MovieDetailRepository @Inject constructor(
+    private val api: ApiInterface
+) {
     private val _movieDetailState = MutableStateFlow(StateMovieDetail())
     val movieDetailState = _movieDetailState.asStateFlow()
-    suspend fun fetchMovieDetail(movieId :Int){
+    suspend fun fetchMovieDetail(movieId: Int) {
         _movieDetailState.value = _movieDetailState.value.copy(loading = true)
         try {
             val response = api.getDetailMovieService(movieId)
@@ -114,7 +124,7 @@ class MovieRepository @Inject constructor(
             _movieDetailState.value = StateMovieDetail(error = true)
         }
     }
-    fun resetMovieDetail () {
+    fun resetMovieDetail() {
         _movieDetailState.value = StateMovieDetail()
     }
 }
