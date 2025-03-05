@@ -1,0 +1,12 @@
+// create file kotlin and paste all above
+package com.devs.filmzy.src.services
+
+// https://developer.themoviedb.org/reference/intro/getting-started - register/login this web to get API_KEY
+object ConfigApi {
+    val BASE_URL = "https://api.themoviedb.org/3/"
+    val BASE_URL_IMG = "https://media.themoviedb.org/t/p/w440_and_h660_face"
+    val API_KEY = ""
+    val LANGUAGE_ID = "en-US"
+    val INCLUDE_ADULT = true
+    val INCLUDE_VIDEO = false
+}
