@@ -33,8 +33,8 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun FilmzyTheme(
-//    darkTheme: Boolean = isSystemInDarkTheme(),
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    // darkTheme: Boolean = false, // if you want check another theme
     // Dynamic color is available on Android 12+ theme on phone
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
