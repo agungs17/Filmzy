@@ -59,26 +59,34 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
 
     // retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     // coil (AsyncImage)
-    implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation("com.google.accompanist:accompanist-coil:0.10.0")
+    implementation(libs.coil.compose)
+    implementation(libs.accompanist.coil)
 
     // flowlayout (FlowRow)
-    implementation("com.google.accompanist:accompanist-flowlayout:0.30.1")
+    implementation(libs.accompanist.flowlayout)
 
     // viewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // navigation
-    implementation("androidx.navigation:navigation-compose:2.8.7")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
 
-    implementation("com.valentinilk.shimmer:compose-shimmer:1.3.2")
+    // shimmer
+    implementation(libs.compose.shimmer)
+
+    // paging
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.paging.compose)
+
+    // date
+    implementation(libs.threetenabp)
 }

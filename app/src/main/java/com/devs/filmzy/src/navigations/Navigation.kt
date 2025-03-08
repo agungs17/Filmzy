@@ -28,8 +28,8 @@ fun Navigation (
         }
 
         composable("DetailMovieView/{movieId}") { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
-            DetailMovieView(movieId)
+            backStackEntry.arguments?.getString("movieId")
+            DetailMovieView()
         }
     }
 }

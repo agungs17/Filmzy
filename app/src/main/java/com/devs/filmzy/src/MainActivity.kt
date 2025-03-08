@@ -31,8 +31,8 @@ class MainActivity : ComponentActivity() {
             val genreViewModel: GenreViewModel = hiltViewModel()
 
             LaunchedEffect(Unit) {
+                genreViewModel.fetch() // fetch genre
                 navigationManager.navigation = navigation
-                genreViewModel.fetch()
             }
 
             FilmzyTheme {

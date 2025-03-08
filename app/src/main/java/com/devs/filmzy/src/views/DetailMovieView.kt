@@ -18,11 +18,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -45,22 +42,10 @@ import com.google.accompanist.flowlayout.FlowRow
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun DetailMovieView(movieId: Int?) {
+fun DetailMovieView() {
     val movieDetailViewModel: MovieDetailViewModel = hiltViewModel()
     val detailState by movieDetailViewModel.state.collectAsState()
     val detailResult = detailState.results
-    val isFetched = rememberSaveable { mutableStateOf(false) }
-
-    //    DisposableEffect ini juga seperti useEffect bedanya dengan LaunchEffect, LaunchEffect tidak punya Unmount cycle. pada DisposableEffect onDispose itu seperti componentWillUnmount
-    DisposableEffect (Unit) {
-        if (movieId != null && !isFetched.value) {
-            movieDetailViewModel.fetch(movieId)
-            isFetched.value = true
-        }
-        onDispose {
-            movieDetailViewModel.reset()
-        }
-    }
 
     Scaffold(
         topBar = {

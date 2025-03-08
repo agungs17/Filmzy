@@ -16,27 +16,25 @@ interface MovieInterface {
         @Query("language") language: String = ConfigApi.LANGUAGE_ID
     ): Response<StateGenreList>
 
-    // movie now playing list
-    @GET("movie/now_playing?")
-    suspend fun getNowPlayingMovieService (
-        @Query("page") page:Int,
-        @Query("language") language: String = ConfigApi.LANGUAGE_ID,
-        @Query("region") region: String = ""
-    ): Response<StateMovieList>
-
-    // movie discovery list
+    // movie list
     @GET("discover/movie?")
-    suspend fun getDiscoveryMovieService (
+    suspend fun getMovieListService (
         @Query("page") page:Int,
+        @Query("sort_by") sortBy: String = "", // default popular.desc
+        @Query("with_release_type") withReleaseType: String = "",
+        @Query("release_date.gte") minDate: String = "",
+        @Query("release_date.lte") maxDate: String = "",
+        @Query("with_genres") withGenres: String = "",
+
         @Query("include_adult") adult:Boolean = ConfigApi.INCLUDE_ADULT,
         @Query("include_video") video:Boolean = ConfigApi.INCLUDE_VIDEO,
         @Query("language") language: String = ConfigApi.LANGUAGE_ID,
-        @Query("sort_by") sortBy: String = "vote_count.desc"
     ): Response<StateMovieList>
 
     @GET("movie/{movieId}?")
     suspend fun getDetailMovieService (
-        @Path("movieId") movieId:Int,
+        @Path("movieId") movieId:String,
+
         @Query("language") language: String = ConfigApi.LANGUAGE_ID
     ): Response<MovieDetail>
 }

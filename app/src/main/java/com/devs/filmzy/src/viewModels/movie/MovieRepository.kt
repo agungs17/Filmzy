@@ -1,23 +1,27 @@
 package com.devs.filmzy.src.repositories
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.devs.filmzy.src.models.GenreList.StateGenreList
 import com.devs.filmzy.src.models.MovieDetail.StateMovieDetail
+import com.devs.filmzy.src.models.MovieList.Movie
 import com.devs.filmzy.src.models.MovieList.StateMovieList
+import com.devs.filmzy.src.paging.movie.MoviePagingSource
 import com.devs.filmzy.src.services.ApiInterface
 import com.devs.filmzy.src.utils.combineMovieGenre
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
-
-
-// >>> Genre Repository
+// >>> Genre Repository (Central State - gunakan @Singleton dan statenya di repository)
 @Singleton
 class GenreListRepository @Inject constructor(
     private val api: ApiInterface
 ) {
     private val _genreState = MutableStateFlow(StateGenreList())
     val genreState = _genreState.asStateFlow()
+
     private var isFetchedGenre = false
     suspend fun fetchGenres() {
         if (isFetchedGenre) return
@@ -42,24 +46,32 @@ class GenreListRepository @Inject constructor(
     }
 }
 
-
-
 // >>> Movie Repository
-@Singleton
 class MovieListRepository @Inject constructor(
     private val api: ApiInterface,
     private val genreRepository: GenreListRepository
 ) {
-
-    private val _nowPlayingState = MutableStateFlow(StateMovieList())
-    val nowPlayingState = _nowPlayingState.asStateFlow()
-    suspend fun fetchNowPlayingMovies(page: Int = 1) {
-        _nowPlayingState.value = _nowPlayingState.value.copy(loading = true)
-        val genres = genreRepository.genreState.first { it.genres.isNotEmpty() }.genres // async/menunggu gendres ada isinya
-        try {
-            val response = api.getNowPlayingMovieService(page)
+    suspend fun fetchMovieList(
+        page: Int = 1,
+        sortBy: String = "",
+        withReleaseType: String = "",
+        maxDate: String = "",
+        minDate: String = "",
+        withGenres: String = ""
+    ): StateMovieList {
+        StateMovieList(loading = true)
+        val genres = genreRepository.genreState.first { it.genres.isNotEmpty() }.genres
+        return try {
+            val response = api.getMovieListService(
+                page = page,
+                sortBy = sortBy,
+                withReleaseType = withReleaseType,
+                maxDate = maxDate,
+                minDate =  minDate,
+                withGenres = withGenres
+            )
             if (response.isSuccessful && response.body() != null) {
-                _nowPlayingState.value = StateMovieList(
+                StateMovieList(
                     results = combineMovieGenre(response.body()!!.results, genres),
                     total_pages = response.body()!!.total_pages,
                     total_results = response.body()!!.total_results,
@@ -67,64 +79,58 @@ class MovieListRepository @Inject constructor(
                     error = false
                 )
             } else {
-                _nowPlayingState.value = StateMovieList(error = true)
+                StateMovieList(error = true)
             }
         } catch (e: Exception) {
-            _nowPlayingState.value = StateMovieList(error = true)
+            StateMovieList(error = true)
         }
     }
 
-    private val _discoveryState = MutableStateFlow(StateMovieList())
-    val discoveryState = _discoveryState.asStateFlow()
-    suspend fun fetchDiscoveryMovies(page: Int = 1) {
-        _discoveryState.value = _discoveryState.value.copy(loading = true)
-        val genres = genreRepository.genreState.first { it.genres.isNotEmpty() }.genres // async/menunggu gendres ada isinya
-        try {
-            val response = api.getDiscoveryMovieService(page)
-            if (response.isSuccessful && response.body() != null) {
-                _discoveryState.value = StateMovieList(
-                    results = combineMovieGenre(response.body()!!.results, genres),
-                    total_pages = response.body()!!.total_pages,
-                    total_results = response.body()!!.total_results,
-                    loading = false,
-                    error = false
+    fun fetchPagingMovieList(
+        sortBy: String = "",
+        withReleaseType: String = "",
+        maxDate: String = "",
+        minDate: String = "",
+        withGenres: String = ""
+    ): Flow<PagingData<Movie>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                MoviePagingSource(
+                    this,
+                    sortBy = sortBy,
+                    withReleaseType = withReleaseType,
+                    maxDate = maxDate,
+                    minDate =  minDate,
+                    withGenres = withGenres
                 )
-            } else {
-                _discoveryState.value = StateMovieList(error = true)
             }
-        } catch (e: Exception) {
-            _discoveryState.value = StateMovieList(error = true)
-        }
+        ).flow
     }
 }
 
-
-
 // >>> Movie Detail Repository
-@Singleton
 class MovieDetailRepository @Inject constructor(
     private val api: ApiInterface
 ) {
-    private val _movieDetailState = MutableStateFlow(StateMovieDetail())
-    val movieDetailState = _movieDetailState.asStateFlow()
-    suspend fun fetchMovieDetail(movieId: Int) {
-        _movieDetailState.value = _movieDetailState.value.copy(loading = true)
-        try {
+    suspend fun fetchMovieDetail(movieId: String) : StateMovieDetail {
+        StateMovieDetail(loading = true)
+        return try {
             val response = api.getDetailMovieService(movieId)
             if (response.isSuccessful && response.body() != null) {
-                _movieDetailState.value = StateMovieDetail(
+                StateMovieDetail(
                     results = response.body(),
                     loading = false,
                     error = false
                 )
             } else {
-                _movieDetailState.value = StateMovieDetail(error = true)
+               StateMovieDetail(error = true)
             }
         } catch (e: Exception) {
-            _movieDetailState.value = StateMovieDetail(error = true)
+            StateMovieDetail(error = true)
         }
-    }
-    fun resetMovieDetail() {
-        _movieDetailState.value = StateMovieDetail()
     }
 }
