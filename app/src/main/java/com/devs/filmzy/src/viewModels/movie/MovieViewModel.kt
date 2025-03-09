@@ -5,17 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.devs.filmzy.src.models.MovieDetail.StateMovieDetail
+import com.devs.filmzy.src.models.MovieList.MovieListParams
 import com.devs.filmzy.src.models.MovieList.StateMovieList
 import com.devs.filmzy.src.repositories.GenreListRepository
+import com.devs.filmzy.src.repositories.MoveListPagingRepository
 import com.devs.filmzy.src.repositories.MovieDetailRepository
 import com.devs.filmzy.src.repositories.MovieListRepository
-import com.devs.filmzy.src.utils.Constants
-import com.devs.filmzy.src.utils.getDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import org.threeten.bp.LocalDate
 import javax.inject.Inject
 
 // init akan terpanggil bila view model di buat, jadi baiknya pakai init bila single page saja (view Scope - contoh : DetailMovieView) atau di panggil sekali saja
@@ -36,40 +37,40 @@ class GenreViewModel @Inject constructor(
 }
 
 @HiltViewModel
-class NowPlayingViewModel @Inject constructor(
+class MovieListViewModel @Inject constructor(
     private val repository: MovieListRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(StateMovieList())
     val state = _state.asStateFlow()
 
-    init {
-        fetch()
-    }
-
-    private fun fetch(page: Int = 1) {
+    fun fetch(movieParams : MovieListParams) {
         if (_state.value.loading && _state.value.results.isNotEmpty()) return
         viewModelScope.launch {
-            _state.value = repository.fetchMovieList(
-                page = page,
-                withReleaseType = "${Constants.ReleaseType.THEATRICAL}|${Constants.ReleaseType.THEATRICAL_LIMITED}",
-                maxDate = getDate(),
-                minDate = getDate(LocalDate.now().minusMonths(1))
-            )
+            _state.value = repository.fetchMovieList(movieParams)
         }
     }
 }
 
 @HiltViewModel
-class DiscoveryMovieViewModel @Inject constructor(
-    repository: MovieListRepository
+class MovieListPagingViewModel @Inject constructor(
+    repository: MoveListPagingRepository
 ) : ViewModel() {
-    val state = repository.fetchPagingMovieList(sortBy = Constants.SortByType.VOTE_COUNT_DESC).cachedIn(viewModelScope)
+    private val _params = MutableStateFlow(MovieListParams())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val state = _params.flatMapLatest { params ->
+        repository.fetchMovieListPaging(params)
+    }.cachedIn(viewModelScope)
+
+    fun updateParams(newParams: MovieListParams) {
+        _params.value = newParams
+    }
 }
 
 @HiltViewModel
 class MovieDetailViewModel @Inject constructor(
-    private val movieDetailRepository: MovieDetailRepository,
+    private val repository: MovieDetailRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -83,7 +84,7 @@ class MovieDetailViewModel @Inject constructor(
 
     private fun fetch(movieId: String) {
         viewModelScope.launch {
-            _state.value = movieDetailRepository.fetchMovieDetail(movieId)
+            _state.value = repository.fetchMovieDetail(movieId)
         }
     }
 }

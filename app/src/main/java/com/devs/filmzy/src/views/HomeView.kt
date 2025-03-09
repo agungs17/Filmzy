@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -48,12 +49,15 @@ import com.devs.filmzy.src.components.HeaderComponent
 import com.devs.filmzy.src.components.IconComponent
 import com.devs.filmzy.src.components.MovieCardHorizontalComponent
 import com.devs.filmzy.src.components.MovieCardVerticalComponent
+import com.devs.filmzy.src.models.MovieList.MovieListParams
 import com.devs.filmzy.src.models.MovieList.StateMovieList
 import com.devs.filmzy.src.theme.fontStyle
 import com.devs.filmzy.src.utils.Constants
-import com.devs.filmzy.src.viewModels.movie.DiscoveryMovieViewModel
-import com.devs.filmzy.src.viewModels.movie.NowPlayingViewModel
+import com.devs.filmzy.src.utils.getDate
+import com.devs.filmzy.src.viewModels.movie.MovieListPagingViewModel
+import com.devs.filmzy.src.viewModels.movie.MovieListViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
+import org.threeten.bp.LocalDate
 
 
 //    perbedaan rememberSaveable dan remember, rememberSaveable Menyimpan state walaupun saat Composable keluar dari Composition kalo remember tidak menyimpan data (di reset) saat composition keluar
@@ -66,14 +70,27 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun HomeView() {
-    val nowPlayingViewModel: NowPlayingViewModel = hiltViewModel()
-    val discoveryMovieViewModel: DiscoveryMovieViewModel = hiltViewModel()
+    val nowPlayingViewModel: MovieListViewModel = hiltViewModel()
+    val discoveryMovieViewModel: MovieListPagingViewModel = hiltViewModel()
 
     val nowPlayingMovieState by nowPlayingViewModel.state.collectAsState()
     val discoveryMovieState = discoveryMovieViewModel.state.collectAsLazyPagingItems()
 
     val listState = rememberLazyListState()
     var useBottomBorder by remember { mutableStateOf(false) }
+    var isFetched by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect (Unit) {
+        if(!isFetched) {
+            discoveryMovieViewModel.updateParams(MovieListParams(sortBy = Constants.SortByType.VOTE_COUNT_DESC))
+            nowPlayingViewModel.fetch(MovieListParams(
+                withReleaseType = "${Constants.ReleaseType.THEATRICAL}|${Constants.ReleaseType.THEATRICAL_LIMITED}",
+                maxDate = getDate(),
+                minDate = getDate(LocalDate.now().minusMonths(1))
+            ))
+            isFetched = true
+        }
+    }
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 70 } // seperti dependency di useEffect
@@ -132,14 +149,6 @@ fun HomeView() {
                         contentPadding = PaddingValues(top = 10.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
                     )
                 }
-                if (discoveryMovieState.loadState.refresh is LoadState.Loading || discoveryMovieState.loadState.append is LoadState.Loading) {
-                    items(3) {
-                        MovieCardHorizontalComponent(
-                            modifier = Modifier.padding(horizontal = 15.dp),
-                            isShimmer = true
-                        )
-                    }
-                }
                 if (discoveryMovieState.loadState.refresh !is LoadState.Loading && discoveryMovieState.itemCount == 0) {
                     item {
                         Text(
@@ -156,6 +165,14 @@ fun HomeView() {
                             movie = movie,
                             modifier = Modifier.padding(horizontal = 15.dp),
                             isShimmer = false
+                        )
+                    }
+                }
+                if (discoveryMovieState.loadState.refresh is LoadState.Loading || discoveryMovieState.loadState.append is LoadState.Loading) {
+                    items(3) {
+                        MovieCardHorizontalComponent(
+                            modifier = Modifier.padding(horizontal = 15.dp),
+                            isShimmer = true
                         )
                     }
                 }

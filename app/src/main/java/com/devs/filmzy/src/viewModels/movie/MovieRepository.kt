@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import com.devs.filmzy.src.models.GenreList.StateGenreList
 import com.devs.filmzy.src.models.MovieDetail.StateMovieDetail
 import com.devs.filmzy.src.models.MovieList.Movie
+import com.devs.filmzy.src.models.MovieList.MovieListParams
 import com.devs.filmzy.src.models.MovieList.StateMovieList
 import com.devs.filmzy.src.paging.movie.MoviePagingSource
 import com.devs.filmzy.src.services.ApiInterface
@@ -46,29 +47,24 @@ class GenreListRepository @Inject constructor(
     }
 }
 
-// >>> Movie Repository
+// >>> Movie List Repository
 class MovieListRepository @Inject constructor(
     private val api: ApiInterface,
     private val genreRepository: GenreListRepository
 ) {
     suspend fun fetchMovieList(
-        page: Int = 1,
-        sortBy: String = "",
-        withReleaseType: String = "",
-        maxDate: String = "",
-        minDate: String = "",
-        withGenres: String = ""
+        movieParams : MovieListParams
     ): StateMovieList {
         StateMovieList(loading = true)
         val genres = genreRepository.genreState.first { it.genres.isNotEmpty() }.genres
         return try {
             val response = api.getMovieListService(
-                page = page,
-                sortBy = sortBy,
-                withReleaseType = withReleaseType,
-                maxDate = maxDate,
-                minDate =  minDate,
-                withGenres = withGenres
+                page = movieParams.page,
+                sortBy = movieParams.sortBy,
+                withReleaseType = movieParams.withReleaseType,
+                maxDate = movieParams.maxDate,
+                minDate =  movieParams.minDate,
+                withGenres = movieParams.withGenres
             )
             if (response.isSuccessful && response.body() != null) {
                 StateMovieList(
@@ -85,13 +81,14 @@ class MovieListRepository @Inject constructor(
             StateMovieList(error = true)
         }
     }
+}
 
-    fun fetchPagingMovieList(
-        sortBy: String = "",
-        withReleaseType: String = "",
-        maxDate: String = "",
-        minDate: String = "",
-        withGenres: String = ""
+// >>> Movie List Paging Repository
+class MoveListPagingRepository @Inject constructor(
+    private val movieListRepository: MovieListRepository
+) {
+    fun fetchMovieListPaging(
+        movieParams: MovieListParams
     ): Flow<PagingData<Movie>> {
         return Pager(
             config = PagingConfig(
@@ -100,12 +97,8 @@ class MovieListRepository @Inject constructor(
             ),
             pagingSourceFactory = {
                 MoviePagingSource(
-                    this,
-                    sortBy = sortBy,
-                    withReleaseType = withReleaseType,
-                    maxDate = maxDate,
-                    minDate =  minDate,
-                    withGenres = withGenres
+                    movieListRepository,
+                    movieParams
                 )
             }
         ).flow
