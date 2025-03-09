@@ -69,6 +69,7 @@ dependencies {
     // coil (AsyncImage)
     implementation(libs.coil.compose)
     implementation(libs.accompanist.coil)
+    implementation(libs.coil.gif)
 
     // flowlayout (FlowRow)
     implementation(libs.accompanist.flowlayout)

@@ -6,6 +6,7 @@ import com.devs.filmzy.src.models.MovieList.Movie
 import com.devs.filmzy.src.models.MovieList.MovieListParams
 import com.devs.filmzy.src.repositories.MovieListRepository
 import com.devs.filmzy.src.utils.anchorPositionClosestPage
+import kotlinx.coroutines.delay
 
 class MoviePagingSource(
     private val repository: MovieListRepository,
@@ -13,6 +14,7 @@ class MoviePagingSource(
 ) : PagingSource<Int, Movie>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Movie> {
         val page = params.key ?: 1 // page di olah langsung oleh paging
+        if(page > 1) delay(800) // agar effect shimmer terlihat saat scrolling - Kenapa delay tidak butuh CoroutineScope? karena sudah di dalam function suspend
         return try {
             val response = repository.fetchMovieList(movieParams.copy(page = page)) // refrensi nya tetap ambil dari MovieListRepository
             LoadResult.Page(

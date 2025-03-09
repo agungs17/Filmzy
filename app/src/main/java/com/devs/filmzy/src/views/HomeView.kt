@@ -104,7 +104,7 @@ fun HomeView() {
     Scaffold (
        topBar = {
            HeaderComponent(
-               contentPadding = PaddingValues(top = 30.dp, bottom = 10.dp, start = 15.dp, end = 15.dp),
+               contentPadding = PaddingValues(top = 40.dp, bottom = 10.dp, start = 15.dp, end = 15.dp),
                contentLeft = {
                    IconComponent(
                        imageVector = Icons.TwoTone.Menu,

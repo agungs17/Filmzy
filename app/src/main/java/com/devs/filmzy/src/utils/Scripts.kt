@@ -1,6 +1,9 @@
 package com.devs.filmzy.src.utils
 
+import android.net.Uri
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.paging.PagingState
 import com.devs.filmzy.src.models.GenreList.Genre
@@ -95,6 +98,12 @@ fun <T : Any> anchorPositionClosestPage(state: PagingState<Int, T>): Int? {
         val closestPage = state.closestPageToPosition(anchor)
         closestPage?.prevKey?.plus(1) ?: closestPage?.nextKey?.minus(1)
     }
+}
+
+@Composable
+fun getUriFromRes (model : Int) : Uri {
+    val context = LocalContext.current
+    return Uri.parse("android.resource://${context.packageName}/$model")
 }
 
 

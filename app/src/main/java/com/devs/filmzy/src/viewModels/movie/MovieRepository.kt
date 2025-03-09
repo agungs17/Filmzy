@@ -11,6 +11,7 @@ import com.devs.filmzy.src.models.MovieList.StateMovieList
 import com.devs.filmzy.src.paging.movie.MoviePagingSource
 import com.devs.filmzy.src.services.ApiInterface
 import com.devs.filmzy.src.utils.combineMovieGenre
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -111,6 +112,7 @@ class MovieDetailRepository @Inject constructor(
 ) {
     suspend fun fetchMovieDetail(movieId: String) : StateMovieDetail {
         StateMovieDetail(loading = true)
+        delay(800)
         return try {
             val response = api.getDetailMovieService(movieId)
             if (response.isSuccessful && response.body() != null) {
