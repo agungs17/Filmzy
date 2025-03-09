@@ -73,7 +73,7 @@ fun DetailMovieView() {
             },
         ) { _ ->
             ImageComponent(
-                model = ConfigApi.BASE_URL_IMG + detailResult?.backdrop_path,
+                model = ConfigApi.BASE_URL_IMG + if(detailResult?.backdrop_path.isNullOrEmpty()) detailResult?.backdrop_path else detailResult?.poster_path,
                 modifier = Modifier.fillMaxWidth(),
                 height = heightImageBackdropDetailMovie
             )
