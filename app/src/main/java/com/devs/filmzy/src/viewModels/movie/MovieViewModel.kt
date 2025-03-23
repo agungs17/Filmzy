@@ -11,6 +11,7 @@ import com.devs.filmzy.src.repositories.GenreListRepository
 import com.devs.filmzy.src.repositories.MoveListPagingRepository
 import com.devs.filmzy.src.repositories.MovieDetailRepository
 import com.devs.filmzy.src.repositories.MovieListRepository
+import com.devs.filmzy.src.viewModels.global.GlobalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,15 +24,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GenreViewModel @Inject constructor(
-    private val repository: GenreListRepository
+    private val genreRepository: GenreListRepository,
+    globalRepository: GlobalRepository
 ) : ViewModel() {
 
-    val state = repository.genreState // langsung ambil dari repository (bersifat di simpan terus sepanjang app berjalan saja)
+    val state = globalRepository.globalState.value.genreState // langsung ambil dari repository global (bersifat di simpan terus sepanjang app berjalan saja)
 
     fun fetch() {
-        if (state.value.loading && state.value.genres.isNotEmpty()) return
+        if (state.loading && state.genres.isNotEmpty()) return
         viewModelScope.launch {
-            repository.fetchGenres()
+            genreRepository.fetchGenres()
         }
     }
 }

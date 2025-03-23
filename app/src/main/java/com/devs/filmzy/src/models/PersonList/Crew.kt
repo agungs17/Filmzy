@@ -2,14 +2,14 @@ package com.devs.filmzy.src.models.PersonList
 
 data class Crew(
     val adult: Boolean,
-    val credit_id: String,
+    override val credit_id: String,
     val department: String,
     val gender: Int,
     val id: Int,
-    val job: String,
+    override val job: String,
     val known_for_department: String,
-    val name: String,
+    override val name: String,
     val original_name: String,
     val popularity: Double,
-    val profile_path: String
-)
+    override val profile_path: String? = null
+) : Person

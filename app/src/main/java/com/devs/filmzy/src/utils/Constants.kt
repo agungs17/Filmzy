@@ -27,9 +27,12 @@ object Constants {
 //        const val TV = 6
     }
 
-    val placeholderListHome = 3
-    val nowShowingListHome = 6
-    val heightImageBackdropDetailMovie = 220.dp
+    val heightImageBackdropDetailMovie = 240.dp
+
+    object configList {
+        val listPlaceholder = 3
+        val listHorizontal = 5
+    }
 
     object ConfigMovieCardHorizontalComponentImage {
         val round = 8.dp

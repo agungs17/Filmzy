@@ -24,26 +24,41 @@ import javax.inject.Singleton
 class NavigationManager @Inject constructor() {
     var navigation: NavController? = null
 
+    private var isNavigate = false
+
+    private fun handleTwiceNavigation(
+        exec: () -> Unit,
+        coroutineExec: (suspend () -> Unit)? = null,
+        delayTime: Long = 500L
+    ) {
+        if (!isNavigate) {
+            isNavigate = true
+            exec()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(delayTime)
+                coroutineExec?.invoke()
+                isNavigate = false
+            }
+        }
+    }
+
     fun navigate(route: String) {
-        navigation?.navigate(route)
+        handleTwiceNavigation({ navigation?.navigate(route) })
     }
 
     fun canGoBack(): Boolean {
         return navigation?.previousBackStackEntry != null
     }
 
-    private var isNavigatingBack = false
     fun goBack() {
-        if (canGoBack() && !isNavigatingBack) {
-            isNavigatingBack = true
-            navigation?.popBackStack()
-
-            // mencegah double click saat back
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(500)
-                isNavigatingBack = false
+        handleTwiceNavigation(
+            exec = {
+                if (canGoBack()) {
+                    navigation?.popBackStack()
+                }
             }
-        }
+        )
     }
 }
 

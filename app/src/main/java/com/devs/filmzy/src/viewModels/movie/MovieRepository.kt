@@ -11,39 +11,30 @@ import com.devs.filmzy.src.models.MovieList.StateMovieList
 import com.devs.filmzy.src.paging.movie.MoviePagingSource
 import com.devs.filmzy.src.services.ApiInterface
 import com.devs.filmzy.src.utils.combineMovieGenre
-import kotlinx.coroutines.delay
+import com.devs.filmzy.src.viewModels.global.GlobalRepository
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
-// >>> Genre Repository (Central State - gunakan @Singleton dan statenya di repository)
-@Singleton
+// >>> Genre List Repository
 class GenreListRepository @Inject constructor(
+    private val globalRepository: GlobalRepository,
     private val api: ApiInterface
 ) {
-    private val _genreState = MutableStateFlow(StateGenreList())
-    val genreState = _genreState.asStateFlow()
-
-    private var isFetchedGenre = false
     suspend fun fetchGenres() {
-        if (isFetchedGenre) return
-        isFetchedGenre = true
-        _genreState.value = StateGenreList(loading = true)
+        globalRepository.updateGlobalState { copy(genreState = StateGenreList(loading = true)) }
         try {
             val response = api.getGenreService()
             if (response.isSuccessful && response.body() != null) {
-                _genreState.value = StateGenreList(
+                globalRepository.updateGlobalState { copy(genreState = StateGenreList(
                     genres = response.body()!!.genres,
                     loading = false,
                     error = false
-                )
+                ))}
             } else {
-                _genreState.value = StateGenreList(error = true)
-                isFetchedGenre = false
+                globalRepository.updateGlobalState { copy(genreState = StateGenreList(error = true)) }
             }
         } catch (e: Exception) {
-            _genreState.value = StateGenreList(error = true)
-            isFetchedGenre = false
+            globalRepository.updateGlobalState { copy(genreState = StateGenreList(error = true)) }
         }
     }
 }
@@ -51,13 +42,13 @@ class GenreListRepository @Inject constructor(
 // >>> Movie List Repository
 class MovieListRepository @Inject constructor(
     private val api: ApiInterface,
-    private val genreRepository: GenreListRepository
+    private val globalRepository: GlobalRepository
 ) {
     suspend fun fetchMovieList(
         movieParams : MovieListParams
     ): StateMovieList {
         StateMovieList(loading = true)
-        val genres = genreRepository.genreState.first { it.genres.isNotEmpty() }.genres
+        val genres = globalRepository.globalState.first { it.genreState.genres.isNotEmpty() }.genreState.genres
         return try {
             val response = api.getMovieListService(
                 page = movieParams.page,
@@ -112,7 +103,6 @@ class MovieDetailRepository @Inject constructor(
 ) {
     suspend fun fetchMovieDetail(movieId: String) : StateMovieDetail {
         StateMovieDetail(loading = true)
-        delay(800)
         return try {
             val response = api.getDetailMovieService(movieId)
             if (response.isSuccessful && response.body() != null) {

@@ -142,7 +142,7 @@ fun HomeView() {
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             )
             {
-                item { NowShowingList(nowPlayingMovieState.copy(results = nowPlayingMovieState.results.take(Constants.nowShowingListHome))) }
+                item { NowShowingList(nowPlayingMovieState.copy(results = nowPlayingMovieState.results.take(Constants.configList.listHorizontal))) }
                 item {
                     HeaderComponent(
                         titleLeft = "Discovery",
@@ -169,7 +169,7 @@ fun HomeView() {
                     }
                 }
                 if (discoveryMovieState.loadState.refresh is LoadState.Loading || discoveryMovieState.loadState.append is LoadState.Loading) {
-                    items(3) {
+                    items(Constants.configList.listPlaceholder) {
                         MovieCardHorizontalComponent(
                             modifier = Modifier.padding(horizontal = 15.dp),
                             isShimmer = true
@@ -192,7 +192,7 @@ fun HomeView() {
 }
 
 @Composable
-fun NowShowingList (
+private fun NowShowingList (
     state : StateMovieList
 ) {
     Column {
@@ -216,7 +216,7 @@ fun NowShowingList (
             horizontalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             itemsIndexed(
-                if (!state.loading) state.results else List(Constants.placeholderListHome) { null },
+                if (!state.loading) state.results else List(Constants.configList.listPlaceholder) { null },
                 key = { index, movie -> movie?.id ?: index }
             ) { index, movie ->
                 MovieCardVerticalComponent(movie = movie, isShimmer = state.loading)
