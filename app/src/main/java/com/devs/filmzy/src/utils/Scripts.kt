@@ -17,11 +17,8 @@ import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class NavigationManager @Inject constructor() {
+class NavigationManager {
     var navigation: NavController? = null
 
     private var isNavigate = false
