@@ -1,4 +1,4 @@
-package com.devs.filmzy.src.components
+package com.devs.filmzy.src.components.atoms
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

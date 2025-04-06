@@ -1,4 +1,4 @@
-package com.devs.filmzy.src.components
+package com.devs.filmzy.src.components.atoms
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

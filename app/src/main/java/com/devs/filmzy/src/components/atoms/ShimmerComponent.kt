@@ -1,8 +1,9 @@
-package com.devs.filmzy.src.components
+package com.devs.filmzy.src.components.atoms
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -36,13 +37,9 @@ fun ShimmerComponent(
                     .shimmer()
                     .clip(RoundedCornerShape(round))
                     .background(Color.Gray)
-                    .then(
-                        if (width != Dp.Unspecified && height != Dp.Unspecified) {
-                            Modifier.width(width).height(height)
-                        } else {
-                            Modifier.matchParentSize()
-                        }
-                    )
+                    .then(if (width != Dp.Unspecified) Modifier.width(width) else Modifier.fillMaxWidth())
+                    .then(if (height != Dp.Unspecified) Modifier.height(height) else Modifier)
+                    .then(if (height == Dp.Unspecified && width == Dp.Unspecified) Modifier.matchParentSize() else Modifier)
             )
         }
     }

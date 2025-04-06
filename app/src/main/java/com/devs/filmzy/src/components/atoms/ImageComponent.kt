@@ -1,4 +1,4 @@
-package com.devs.filmzy.src.components
+package com.devs.filmzy.src.components.atoms
 
 import android.net.Uri
 import android.os.Build

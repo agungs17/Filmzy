@@ -1,4 +1,4 @@
-package com.devs.filmzy.src.components
+package com.devs.filmzy.src.components.molecules
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -13,12 +13,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.devs.filmzy.src.components.atoms.ImageComponent
+import com.devs.filmzy.src.components.atoms.ShimmerComponent
 import com.devs.filmzy.src.models.PersonList.Person
 import com.devs.filmzy.src.services.ConfigApi
 import com.devs.filmzy.src.theme.fontStyle
 
 @Composable
-fun PersonCardHorizontalComponent(
+fun PersonCardVerticalComponent(
     modifier: Modifier = Modifier,
     person: Person? = null,
     isShimmer: Boolean = false
@@ -76,7 +78,7 @@ fun PersonCardHorizontalComponent(
     }
 }
 
-//fun PersonCardVerticalComponent (
+//fun PersonCardHorizontalComponent (
 //
 //) {
 //

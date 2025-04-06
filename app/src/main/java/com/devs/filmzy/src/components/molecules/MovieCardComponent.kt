@@ -1,4 +1,4 @@
-package com.devs.filmzy.src.components
+package com.devs.filmzy.src.components.molecules
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -23,6 +23,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.devs.filmzy.src.components.atoms.BadgeComponent
+import com.devs.filmzy.src.components.atoms.IconComponent
+import com.devs.filmzy.src.components.atoms.ImageComponent
+import com.devs.filmzy.src.components.atoms.ShimmerComponent
 import com.devs.filmzy.src.models.MovieList.Movie
 import com.devs.filmzy.src.services.ConfigApi
 import com.devs.filmzy.src.theme.fontStyle
